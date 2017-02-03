@@ -12,25 +12,25 @@
 
 <body>
     <div>
-        Genislik : <select style="height: 30px;width: 100px" id="genislik">
+        Size : <select style="height: 30px;width: 100px" id="size">
             <option value="1">1</option>
             <option value="3">3</option>
             <option value="5">5</option>
             <option value="7">7</option>
             <option value="9" selected="selected">9</option>
             <option value="11">11</option>
-        </select> Renk : <select style="height: 30px;width: 100px"  id="renk">
-            <option value="white">white</option>
-            <option value="black">black</option>
-            <option value="blue" selected="selected">blue</option>
-            <option value="red">red</option>
-            <option value="green">green</option>
-            <option value="yellow">yellow</option>
-            <option value="gray">gray</option>
+        </select> Color : <select style="height: 30px;width: 100px"  id="color">
+            <option value="white">White</option>
+            <option value="black">Black</option>
+            <option value="blue" selected="selected">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="yellow">Yellow</option>
+            <option value="gray">Gray</option>
         </select>
     </div>
     <div>
-        <canvas style="background: white" width="600" height="600" id="cizim"></canvas>
+        <canvas style="background: white" width="600" height="600" id="canvas"></canvas>
     </div>
 <div>
     <h1>Alper Tokcan <span style="color:red">♥</span>Reddit</h1>
@@ -39,27 +39,26 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
     var socket = io();
-    // $('form').submit(function(){
-    //   socket.emit('chat message', $('#m').val());
-    //   $('#m').val('');
-    //   return false;
-    // });
     var lastX, lastY;
     var mousePressed = false;
-    var ctx = document.getElementById('cizim').getContext("2d");
+    var ctx = document.getElementById('canvas').getContext("2d");
     var touchfirst = false;
-    socket.on('ciz', function (args) {
+
+    socket.on('draw', function (args) {
         DrawR(args.W.X, args.W.Y, args.T.X, args.T.Y, args.C, args.G);
     });
-    $('#cizim')[0].addEventListener('touchstart', function (e) {
+
+    $('#canvas')[0].addEventListener('touchstart', function (e) {
         mousePressed = true;
         touchfirst = true;
 
     });
-    $('#cizim')[0].addEventListener('touchend', function (e) {
+
+    $('#canvas')[0].addEventListener('touchend', function (e) {
         mousePressed = false;
     });
-    $('#cizim')[0].addEventListener('touchmove', function (e) {
+
+    $('#canvas')[0].addEventListener('touchmove', function (e) {
         var x = e.touches[0].clientX;
         var y = e.touches[0].clientY;
 
@@ -67,23 +66,26 @@
             Draw(x, y, true);
         }
     });
-    $('#cizim').mousedown(function (e) {
+
+    $('#canvas').mousedown(function (e) {
         mousePressed = true;
         Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
     });
 
-    $('#cizim').mousemove(function (e) {
+    $('#canvas').mousemove(function (e) {
         if (mousePressed) {
             Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
         }
     });
 
-    $('#cizim').mouseup(function (e) {
+    $('#canvas').mouseup(function (e) {
         mousePressed = false;
     });
-    $('#cizim').mouseleave(function (e) {
+
+    $('#canvas').mouseleave(function (e) {
         mousePressed = false;
     });
+
     function Draw(x, y, isDown) {
 
         if (isNaN(x) || isNaN(y))
@@ -94,16 +96,17 @@
             return;
         }
         if (isDown) {
-            socket.emit("ciz", {
+            socket.emit("draw", {
                 W: { X: lastX, Y: lastY },
                 T: { X: x, Y: y },
-                C: $('#renk').val(),
-                G: $('#genislik').val()
+                C: $('#color').val(),
+                G: $('#size').val()
             }
             );
         }
         lastX = x; lastY = y;
     }
+
     function DrawR(fx, fy, tx, ty, renk, genislik) {
         ctx.beginPath();
         ctx.strokeStyle = renk;
@@ -113,7 +116,6 @@
         ctx.lineTo(tx, ty);
         ctx.closePath();
         ctx.stroke();
-
     }
 
 

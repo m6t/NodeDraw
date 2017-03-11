@@ -53,4 +53,4 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(80, '0.0.0.0');
+http.listen(process.env.PORT || 5000);
